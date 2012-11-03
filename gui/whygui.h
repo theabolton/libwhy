@@ -1,4 +1,4 @@
-/* ygtk - a lightweight Lua GTK+ binding
+/* whygui.h - a lightweight Lua GTK+ binding
  *
  * Copyright (c) 2011 Sean Bolton and others.
  *
