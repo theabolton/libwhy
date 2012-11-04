@@ -1,6 +1,6 @@
 libwhy
 ------
-libwhy is a library for developing GTK+_ applications using Lua_.
+libwhy is a library for developing `GTK+`_ applications using Lua_.
 
 libwhy is written and copyright (c) 2012 by `Sean Bolton`_, and is
 licensed under the GNU Lesser General Public License, version 2.1.
