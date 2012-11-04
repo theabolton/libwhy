@@ -37,5 +37,5 @@ while release tarballs may be found here:
 .. _GTK+: http://www.gtk.org/
 .. _Lua: http://www.lua.org/
 .. _`Sean Bolton`: http://smbolton.com/
-.. _`advanced readline patch`: http://foo.com/
+.. _`advanced readline patch`: http://smbolton.com/lua.html#readline
 
