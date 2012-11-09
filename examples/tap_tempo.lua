@@ -1,4 +1,4 @@
-#! /usr/bin/env lua
+#!/usr/bin/env ylua
 
 -- Tap Tempo, by Sean Bolton
 
@@ -11,7 +11,14 @@
 -- You should have received a copy of the CC0 legalcode along with this
 -- work.  If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-require("ygtk")
+function try_require(module, message)
+  if not pcall(require, module) then
+    print(string.format("%s: could not load module '%s': %s", arg[0], module, message))
+    os.exit(1)
+  end
+end
+
+try_require("ygtk", "perhaps you need to run this with libwhy's ylua?")
 
 gtk.init()
 

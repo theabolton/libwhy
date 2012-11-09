@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/usr/bin/env ylua
 
 -- Nonogram, by Sean Bolton
 
@@ -13,15 +13,23 @@
 -- You should have received a copy of the CC0 legalcode along with this
 -- work.  If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-require 'ygtk'
+function try_require(module, message)
+    if not pcall(require, module) then
+      print(string.format("%s: could not load module '%s': %s", arg[0], module, message))
+      os.exit(1)
+    end
+end
+
+try_require('ygtk', "perhaps you need to run this with libwhy's ylua?")
 
 gtk.init()
 local window     = gtk.window.new()
-local wtable     = gtk.table.new(2, 3, false)
+local wtable     = gtk.table.new(3, 3, false)
 local directions = gtk.label.new('Digits show the number of consecutive coins in the ' ..
                                  'respective row or column. Left-click to mark a coin, ' ..
                                  'middle-click to mark a space.')
-local newbutton  = gtk.button.new_with_label('New')
+local fillbutton = gtk.check_button.new_with_label('Auto-fill spaces')
+local newbutton  = gtk.button.new_with_label('New game')
 local mistake_label = gtk.label.new('(Starting....)')
 local field      = gtk.drawing_area.new()
 
@@ -84,7 +92,7 @@ function expose(widget, event, data)
       end
       cr:restore()
     end
-    cr:select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+    cr:select_font_face('Sans', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
     cr:set_font_size(12)
     for y = 1, 10 do
     -- -FIX- this works, but it gives away information!
@@ -185,15 +193,47 @@ function expose(widget, event, data)
     return true
 end
 
-function on_button_clicked()
-    print('New!')
-    new_puzzle()
-    mistake_label:set('label', 'Mistakes: 0')
-    field:queue_draw()
+function check_for_fill(x, y)
+  local all = true
+  for xi = 1, 10 do
+    if puzzle[xi][y] and not guess[xi][y] then
+      all = false
+      break
+    end
+  end
+  if all then
+    for xi = 1, 10 do
+      if not puzzle[xi][y] then
+        guess[xi][y] = guess[xi][y] or true
+      end
+    end
+  end
+  all = true
+  for yi = 1, 10 do
+    if puzzle[x][yi] and not guess[x][yi] then
+      all = false
+      break
+    end
+  end
+  if all then
+    for yi = 1, 10 do
+      if not puzzle[x][yi] then
+        guess[x][yi] = guess[x][yi] or true
+      end
+    end
+  end
 end
 
-function on_key_press_event()
-    print('key!')
+function on_newbutton_clicked()
+    -- print('New!')
+    new_puzzle()
+    mistake_label:set('label', 'Mistakes: 0')
+    if fillbutton:get_active() then
+      for i = 1, 10 do
+        check_for_fill(i, i)
+      end
+    end
+    field:queue_draw()
 end
 
 function on_field_clicked(widget, event, data)
@@ -203,11 +243,14 @@ function on_field_clicked(widget, event, data)
   if x > 0 and y > 0 and x % 40 ~= 0 and y % 40 ~= 0 then
     x = math.floor(x / 40) + 1
     y = math.floor(y / 40) + 1
-    print("Click!", button, _x, _y, x, y)
+    -- print('Click!', button, _x, _y, x, y)
     if not guess[x][y] then
       if button == 1 then
         if puzzle[x][y] then
           guess[x][y] = true
+          if fillbutton:get_active() then
+            check_for_fill(x, y)
+          end
         else
           guess[x][y] = 'x'
           mistakes = mistakes + 1
@@ -218,36 +261,38 @@ function on_field_clicked(widget, event, data)
         else
           guess[x][y] = 'x'
           mistakes = mistakes + 1
+          if fillbutton:get_active() then
+            check_for_fill(x, y)
+          end
         end
       end
       mistake_label:set('label', string.format('Mistakes: %d', mistakes))
       field:queue_draw()
     end
   else
-    print("(Miss)", button, _x, _y)
+    -- print('(Miss)', button, _x, _y)
   end
 end
 
-window:set('title', 'Puzzle')
+window:set('title', 'Nonogram')
 window:signal_connect('destroy', gtk.main_quit)
 window:signal_connect('delete-event', function() gtk.main_quit() return true end)
 window:add(wtable)
 wtable:set('border-width', 10)
-wtable:attach(directions, 0, 2, 0, 1, 0, 0, 0, 0)
-wtable:attach(field, 0, 2, 1, 2, 0, 0, 0, 0)
-wtable:attach(mistake_label, 0, 1, 2, 3, 0, 0, 0, 0)
-wtable:attach(newbutton, 1, 2, 2, 3, 0, 0, 0, 0)
+wtable:attach(directions, 0, 3, 0, 1, 0, 0, 0, 0)
+wtable:attach(field, 0, 3, 1, 2, 0, 0, 0, 10)
+wtable:attach(mistake_label, 0, 1, 2, 3, gtk.EXPAND, 0, 0, 0)
+wtable:attach(fillbutton, 1, 2, 2, 3, 0, 0, 0, 0)
+wtable:attach(newbutton, 2, 3, 2, 3, gtk.EXPAND, 0, 0, 0)
 directions:set('wrap', true)
-newbutton:signal_connect('clicked', on_button_clicked)
 field:set('width-request', 501, 'height-request', 501)
 field:signal_connect('expose-event', expose)
-field:add_events(gdk.KEY_PRESS_MASK)
-field:signal_connect('key-press-event', on_key_press_event)
 field:add_events(gdk.BUTTON_PRESS_MASK)
 field:signal_connect('button-press-event', on_field_clicked)
+newbutton:signal_connect('clicked', on_newbutton_clicked)
 
 math.randomseed(os.time())
-on_button_clicked() -- does the whole new puzzle thing
+on_newbutton_clicked() -- does the whole new puzzle thing
 
 window:show_all()
 

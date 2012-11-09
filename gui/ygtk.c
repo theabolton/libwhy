@@ -539,7 +539,7 @@ yg_gvalue_to_lua(lua_State *L, const GValue *gv)
         const char *name = g_type_name(gtype);
         GValue *gvbox;
 
-        if (gtype != GDK_TYPE_EVENT)
+        if (gtype != GDK_TYPE_EVENT && gtype != GDK_TYPE_RECTANGLE)
             fprintf(stderr, "*** yg_gvalue_to_lua WARNING: pushing a '%s', make sure copy/gc is correct!\n", name);
             /* ... which means this is likely happening during a callback, and we're about to create
              * a copy which will hang around after the callback until it is collected, so we better
@@ -1196,8 +1196,32 @@ ycairo_context_close_path (lua_State *L)
 
 #line 1220 "ygtk.c.in"
 
-#line 1248 "ygtk.c.in"
+static int
+ycairo_context_create(lua_State *L)
+{
+    ygtk_object *s = ygtk_checkuserdata(L, 1);
 
+    cairo_t *cr = cairo_create((cairo_surface_t *)s->instance); /* may fail, but cr will point to error context */
+    ygtk_make_simple_object(L, cr, "cairo.context");
+
+    return 1;
+}
+
+// %% function:	curve_to	vodddddd
+static int
+ycairo_context_curve_to (lua_State *L)
+{
+    cairo_curve_to(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance,
+        luaL_checknumber(L, 2),
+        luaL_checknumber(L, 3),
+        luaL_checknumber(L, 4),
+        luaL_checknumber(L, 5),
+        luaL_checknumber(L, 6),
+        luaL_checknumber(L, 7));
+    return 0;
+}
+
+#line 1233 "ygtk.c.in"
 // %% function:	fill	vo
 static int
 ycairo_context_fill (lua_State *L)
@@ -1206,7 +1230,7 @@ ycairo_context_fill (lua_State *L)
     return 0;
 }
 
-#line 1249 "ygtk.c.in"
+#line 1234 "ygtk.c.in"
 // %% function:	fill_preserve	vo
 static int
 ycairo_context_fill_preserve (lua_State *L)
@@ -1215,7 +1239,7 @@ ycairo_context_fill_preserve (lua_State *L)
     return 0;
 }
 
-#line 1250 "ygtk.c.in"
+#line 1235 "ygtk.c.in"
 // %% function:	line_to	vodd
 static int
 ycairo_context_line_to (lua_State *L)
@@ -1226,7 +1250,7 @@ ycairo_context_line_to (lua_State *L)
     return 0;
 }
 
-#line 1251 "ygtk.c.in"
+#line 1236 "ygtk.c.in"
 // %% function:	move_to	vodd
 static int
 ycairo_context_move_to (lua_State *L)
@@ -1237,7 +1261,7 @@ ycairo_context_move_to (lua_State *L)
     return 0;
 }
 
-#line 1252 "ygtk.c.in"
+#line 1237 "ygtk.c.in"
 // %% function:	paint	vo
 static int
 ycairo_context_paint (lua_State *L)
@@ -1246,9 +1270,9 @@ ycairo_context_paint (lua_State *L)
     return 0;
 }
 
-#line 1253 "ygtk.c.in"
+#line 1238 "ygtk.c.in"
 
-#line 1265 "ygtk.c.in"
+#line 1250 "ygtk.c.in"
 
 // %% function:	rectangle	vodddd
 static int
@@ -1262,10 +1286,18 @@ ycairo_context_rectangle (lua_State *L)
     return 0;
 }
 
-#line 1266 "ygtk.c.in"
+#line 1251 "ygtk.c.in"
+// %% function:	rel_line_to	vodd
+static int
+ycairo_context_rel_line_to (lua_State *L)
+{
+    cairo_rel_line_to(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance,
+        luaL_checknumber(L, 2),
+        luaL_checknumber(L, 3));
+    return 0;
+}
 
-#line 1279 "ygtk.c.in"
-
+#line 1252 "ygtk.c.in"
 // %% function:	restore	vo
 static int
 ycairo_context_restore (lua_State *L)
@@ -1274,9 +1306,9 @@ ycairo_context_restore (lua_State *L)
     return 0;
 }
 
-#line 1280 "ygtk.c.in"
+#line 1253 "ygtk.c.in"
 
-#line 1292 "ygtk.c.in"
+#line 1265 "ygtk.c.in"
 
 // %% function:	save	vo
 static int
@@ -1286,7 +1318,7 @@ ycairo_context_save (lua_State *L)
     return 0;
 }
 
-#line 1293 "ygtk.c.in"
+#line 1266 "ygtk.c.in"
 // %% function:	scale	vodd
 static int
 ycairo_context_scale (lua_State *L)
@@ -1297,7 +1329,7 @@ ycairo_context_scale (lua_State *L)
     return 0;
 }
 
-#line 1294 "ygtk.c.in"
+#line 1267 "ygtk.c.in"
 // %% function:	select_font_face	vosii
 static int
 ycairo_context_select_font_face (lua_State *L)
@@ -1309,9 +1341,9 @@ ycairo_context_select_font_face (lua_State *L)
     return 0;
 }
 
-#line 1295 "ygtk.c.in"
+#line 1268 "ygtk.c.in"
 
-#line 1307 "ygtk.c.in"
+#line 1280 "ygtk.c.in"
 
 // %% function:	set_font_size	vod
 static int
@@ -1322,10 +1354,17 @@ ycairo_context_set_font_size (lua_State *L)
     return 0;
 }
 
-#line 1308 "ygtk.c.in"
+#line 1281 "ygtk.c.in"
+// %% function:	set_line_cap	voi
+static int
+ycairo_context_set_line_cap (lua_State *L)
+{
+    cairo_set_line_cap(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance,
+        luaL_checkint(L, 2));
+    return 0;
+}
 
-#line 1320 "ygtk.c.in"
-
+#line 1282 "ygtk.c.in"
 // %% function:	set_line_width	vod
 static int
 ycairo_context_set_line_width (lua_State *L)
@@ -1335,7 +1374,7 @@ ycairo_context_set_line_width (lua_State *L)
     return 0;
 }
 
-#line 1321 "ygtk.c.in"
+#line 1283 "ygtk.c.in"
 
 static int
 ycairo_context_set_source_hsv(lua_State *L)  /* -DOCNOTE- an addition to the cario API */
@@ -1394,9 +1433,24 @@ ycairo_context_set_source_rgb (lua_State *L)
     return 0;
 }
 
-#line 1369 "ygtk.c.in"
+#line 1331 "ygtk.c.in"
 
-#line 1407 "ygtk.c.in"
+#line 1346 "ygtk.c.in"
+
+// %% function:	set_source_surface	voodd
+static int
+ycairo_context_set_source_surface (lua_State *L)
+{
+    cairo_set_source_surface(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance,
+        ((ygtk_object *)ygtk_checkuserdata(L, 2))->instance,
+        luaL_checknumber(L, 3),
+        luaL_checknumber(L, 4));
+    return 0;
+}
+
+#line 1347 "ygtk.c.in"
+
+#line 1358 "ygtk.c.in"
 
 // %% function:	show_text	vos
 static int
@@ -1407,7 +1461,7 @@ ycairo_context_show_text (lua_State *L)
     return 0;
 }
 
-#line 1408 "ygtk.c.in"
+#line 1359 "ygtk.c.in"
 // %% function:	stroke	vo
 static int
 ycairo_context_stroke (lua_State *L)
@@ -1416,9 +1470,9 @@ ycairo_context_stroke (lua_State *L)
     return 0;
 }
 
-#line 1409 "ygtk.c.in"
+#line 1360 "ygtk.c.in"
 
-#line 1421 "ygtk.c.in"
+#line 1372 "ygtk.c.in"
 
 // %% function:	translate	vodd
 static int
@@ -1430,50 +1484,115 @@ ycairo_context_translate (lua_State *L)
     return 0;
 }
 
-#line 1422 "ygtk.c.in"
-#line 1425 "ygtk.c.in"
+#line 1373 "ygtk.c.in"
+#line 1376 "ygtk.c.in"
 
 static const luaL_Reg ylib_cairo_context[] = {
     { "__gc",             ycairo_context__gc },
     { "__tostring",       ycairo_context__tostring },
-#line 1432 "ygtk.c.in"
+#line 1381 "ygtk.c.in"
+    { "create",           ycairo_context_create },
+#line 1383 "ygtk.c.in"
     { "destroy",          ycairo_context__gc },
-#line 1438 "ygtk.c.in"
+#line 1387 "ygtk.c.in"
     { "set_source_hsv",   ycairo_context_set_source_hsv },
-#line 1443 "ygtk.c.in"
+#line 1391 "ygtk.c.in"
 // %% ylib def:	cairo_context
     { "arc",               ycairo_context_arc },
     { "close_path",        ycairo_context_close_path },
+    { "curve_to",          ycairo_context_curve_to },
     { "fill",              ycairo_context_fill },
     { "fill_preserve",     ycairo_context_fill_preserve },
     { "line_to",           ycairo_context_line_to },
     { "move_to",           ycairo_context_move_to },
     { "paint",             ycairo_context_paint },
     { "rectangle",         ycairo_context_rectangle },
+    { "rel_line_to",       ycairo_context_rel_line_to },
     { "restore",           ycairo_context_restore },
     { "save",              ycairo_context_save },
     { "scale",             ycairo_context_scale },
     { "select_font_face",  ycairo_context_select_font_face },
     { "set_font_size",     ycairo_context_set_font_size },
+    { "set_line_cap",      ycairo_context_set_line_cap },
     { "set_line_width",    ycairo_context_set_line_width },
     { "set_source_rgb",    ycairo_context_set_source_rgb },
+    { "set_source_surface", ycairo_context_set_source_surface },
     { "show_text",         ycairo_context_show_text },
     { "stroke",            ycairo_context_stroke },
     { "translate",         ycairo_context_translate },
-#line 1443 "ygtk.c.in"
+#line 1391 "ygtk.c.in"
     { NULL, NULL }
 };
 
 // %% class:	nil	nil
 
-#line 1628 "ygtk.c.in"
+static int
+ycairo_surface__gc(lua_State *L)
+{
+    ygtk_object *o = (ygtk_object *)lua_touserdata(L, 1);
 
-/* ==== pango ==== */
+    if (o->instance) {
+        y_gc_debug("ycairo_surface__gc called on %p -> %p\n", o, o->instance);
+        cairo_surface_destroy((cairo_surface_t *)(o->instance));
+        o->instance = NULL;
+} else { y_gc_debug("ycairo_surface__gc: %p already nulled\n", o);
+    }
 
-static const luaL_Reg ylib_pango[] = {
-#line 1633 "ygtk.c.in"
+    return 0;
+}
+
+static int
+ycairo_surface__tostring(lua_State *L)
+{
+    ygtk_object *o = (ygtk_object*) lua_touserdata(L, 1);
+    gchar name[256];
+
+    g_snprintf(name, 255, "cairo surface: %p -> %p", o, o->instance);
+    lua_pushstring(L, name);
+
+    return 1;
+}
+
+#line 1467 "ygtk.c.in"
+
+static int
+ycairo_image_surface_create(lua_State *L)
+{
+    int format = luaL_checkint(L, 1);
+    int width  = luaL_checkint(L, 2);
+    int height = luaL_checkint(L, 3);
+    cairo_surface_t *s;
+
+    s = cairo_image_surface_create(format, width, height); /* may fail, but s will point to "nil" surface */
+    ygtk_make_simple_object(L, s, "cairo.surface");
+
+    return 1;
+}
+
+#line 1539 "ygtk.c.in"
+
+static const luaL_Reg ylib_cairo_surface[] = {
+    { "__gc",                 ycairo_surface__gc },
+    { "__tostring",           ycairo_surface__tostring },
+    { "destroy",              ycairo_surface__gc },
+#line 1547 "ygtk.c.in"
     { NULL, NULL }
 };
+
+/* -DOCNOTE- syntactic sugar for the cairo image surface methods (since they don't inherit) */
+static const luaL_Reg ylib_cairo_image_surface[] = {
+    /* cairo_surface_t methods */
+    { "__gc",                 ycairo_surface__gc },
+    { "__tostring",           ycairo_surface__tostring },
+    { "destroy",              ycairo_surface__gc },
+#line 1557 "ygtk.c.in"
+    /* cairo_image_surface_t methods */
+    { "create",               ycairo_image_surface_create },
+#line 1562 "ygtk.c.in"
+    { NULL, NULL }
+};
+
+#line 1583 "ygtk.c.in"
 
 /* ==== gdk/gtk class support ==== */
 
@@ -1676,13 +1795,13 @@ ygdk_cairo_set_source_pixbuf (lua_State *L)
     return 0;
 }
 
-#line 1826 "ygtk.c.in"
+#line 1774 "ygtk.c.in"
 
 static const luaL_Reg ylib_gdk[] = {
     { "cairo_create", ygdk_cairo_create },
 // %% ylib def:	gdk
     { "cairo_set_source_pixbuf", ygdk_cairo_set_source_pixbuf },
-#line 1830 "ygtk.c.in"
+#line 1778 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -1765,20 +1884,28 @@ ygdk_pixbuf_new_subpixbuf(lua_State *L)
     return 1;
 }
 
-#line 1925 "ygtk.c.in"
+#line 1873 "ygtk.c.in"
 
 static const luaL_Reg ylib_gdk_pixbuf[] = {
     { "new_from_file", ygdk_pixbuf_new_from_file },
     { "new_subpixbuf", ygdk_pixbuf_new_subpixbuf },
-#line 1930 "ygtk.c.in"
+#line 1878 "ygtk.c.in"
     { NULL, NULL }
 };
 
 /* ==== Gtk interfaces (may have entries in each object table that implements them) ==== */
 
-#line 2211 "ygtk.c.in"
+#line 2159 "ygtk.c.in"
 
 /* ==== Gtk non-object functions ==== */
+
+static int
+ygtk_events_pending(lua_State *L)
+{
+    lua_pushboolean(L, gtk_events_pending());
+
+    return 1;
+}
 
 static int
 ygtk_init(lua_State *L)
@@ -1819,23 +1946,24 @@ ygtk_main_quit(lua_State* L)
     return 0;
 }
 
-#line 2274 "ygtk.c.in"
+#line 2230 "ygtk.c.in"
 
 static int ygtk_text_iter_get_offset(lua_State *L);  /* forward */
 static int ygtk_text_iter_new(lua_State *L);         /* forward */
 
 static const luaL_Reg ylib_gtk[] = {
+    { "events_pending",    ygtk_events_pending },
     { "init",              ygtk_init },
     { "main",              ygtk_main },
     { "main_iteration_do", ygtk_main_iteration_do },
     { "main_quit",         ygtk_main_quit },
     { "text_iter_get_offset", ygtk_text_iter_get_offset },
     { "text_iter_new",     ygtk_text_iter_new },
-#line 2288 "ygtk.c.in"
+#line 2245 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 2545 "ygtk.c.in"
+#line 2502 "ygtk.c.in"
 
 /* GObject / GtkTextBuffer */
 
@@ -1872,7 +2000,7 @@ ygtk_text_buffer_apply_tag_by_name (lua_State *L)
     return 0;
 }
 
-#line 2570 "ygtk.c.in"
+#line 2527 "ygtk.c.in"
 
 /* -DOCNOTE- GtkTextBuffer:create_mark does not return the mark */
 // %% function:	create_mark	vo(GTK_TEXT_BUFFER)spb
@@ -1886,7 +2014,7 @@ ygtk_text_buffer_create_mark (lua_State *L)
     return 0;
 }
 
-#line 2573 "ygtk.c.in"
+#line 2530 "ygtk.c.in"
 
 static int
 ygtk_text_buffer_create_tag(lua_State *L)  /* -DOCNOTE- accepts one or more pairs of (property_name, value). */
@@ -1933,7 +2061,7 @@ ygtk_text_buffer_get_iter_at_offset (lua_State *L)
     return 0;
 }
 
-#line 2610 "ygtk.c.in"
+#line 2567 "ygtk.c.in"
 
 static int
 ygtk_text_buffer_insert(lua_State *L)
@@ -1969,24 +2097,75 @@ ygtk_text_buffer_insert_pixbuf (lua_State *L)
     return 0;
 }
 
-#line 2636 "ygtk.c.in"
+#line 2593 "ygtk.c.in"
 
-#line 2705 "ygtk.c.in"
+static int
+ygtk_text_buffer_insert_with_tags_by_name(lua_State *L)
+{
+    ygtk_object *tb = ygtk_checkuserdata(L, 1);
+    GtkTextIter *ti = ygtk_checkuserdata(L, 2);
+    const gchar *text = luaL_checkstring(L, 3);
+    gint len = luaL_checkinteger(L, 4);
+    int p;
+    const gchar *name[8];
+
+    if (lua_gettop(L) > 12) {
+        fprintf(stderr, "ERROR: ygtk_text_buffer_insert_with_tags_by_name does not support more than eight tag names\n"); /* -DOCNOTE- */
+    }
+    for (p = 5; p <= 12; p++) {
+        if (p <= lua_gettop(L))
+            name[p - 5] = luaL_checkstring(L, p);
+        else
+            name[p - 5] = NULL;
+    }
+    gtk_text_buffer_insert_with_tags_by_name(GTK_TEXT_BUFFER(tb->instance), ti, text, len,
+                                             name[0], name[1], name[2], name[3],
+                                             name[4], name[5], name[6], name[7], NULL);
+
+    return 0;
+}
+
+#line 2639 "ygtk.c.in"
+
+static int
+ygtk_text_buffer_set_text(lua_State *L)
+{
+    ygtk_object *b = ygtk_checkuserdata(L, 1);
+    size_t len;
+    const gchar *text = luaL_checklstring(L, 2, &len);
+
+    /* -DOCNOTE-
+     * if third argument 'length' is not given: use Lua string length
+     * if it is given and is -1: use Lua string length
+     * it if is given and is not -1: use given string length
+     */
+    if (!lua_isnone(L, 3)) {
+        int tmp = luaL_checknumber(L, 3);
+
+        if (tmp != -1)
+            len = tmp;
+    }
+    gtk_text_buffer_set_text(GTK_TEXT_BUFFER(b->instance), text, len);
+
+    return 0;
+}
 
 static const luaL_Reg ylib_gtk_text_buffer[] = {
     { "create_tag",    ygtk_text_buffer_create_tag },
     { "insert",        ygtk_text_buffer_insert },
-#line 2712 "ygtk.c.in"
+    { "insert_with_tags_by_name", ygtk_text_buffer_insert_with_tags_by_name },
+#line 2668 "ygtk.c.in"
+    { "set_text",      ygtk_text_buffer_set_text },
 // %% ylib def:	gtk_text_buffer
     { "apply_tag_by_name", ygtk_text_buffer_apply_tag_by_name },
     { "create_mark",       ygtk_text_buffer_create_mark },
     { "get_iter_at_offset", ygtk_text_buffer_get_iter_at_offset },
     { "insert_pixbuf",     ygtk_text_buffer_insert_pixbuf },
-#line 2712 "ygtk.c.in"
+#line 2669 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 2883 "ygtk.c.in"
+#line 2840 "ygtk.c.in"
 
 /* GtkObject / GtkAdjustment */
 
@@ -2005,7 +2184,7 @@ ygtk_adjustment_get_lower (lua_State *L)
     return 1;
 }
 
-#line 2890 "ygtk.c.in"
+#line 2847 "ygtk.c.in"
 // %% function:	get_upper	do(GTK_ADJUSTMENT)
 static int
 ygtk_adjustment_get_upper (lua_State *L)
@@ -2017,7 +2196,7 @@ ygtk_adjustment_get_upper (lua_State *L)
     return 1;
 }
 
-#line 2891 "ygtk.c.in"
+#line 2848 "ygtk.c.in"
 // %% function:	get_value	do(GTK_ADJUSTMENT)
 static int
 ygtk_adjustment_get_value (lua_State *L)
@@ -2029,7 +2208,7 @@ ygtk_adjustment_get_value (lua_State *L)
     return 1;
 }
 
-#line 2892 "ygtk.c.in"
+#line 2849 "ygtk.c.in"
 // %% function:	new	Odddddd
 static int
 ygtk_adjustment_new (lua_State *L)
@@ -2048,7 +2227,7 @@ ygtk_adjustment_new (lua_State *L)
     return 1;
 }
 
-#line 2893 "ygtk.c.in"
+#line 2850 "ygtk.c.in"
 // %% function:	set_value	vo(GTK_ADJUSTMENT)d
 static int
 ygtk_adjustment_set_value (lua_State *L)
@@ -2058,7 +2237,7 @@ ygtk_adjustment_set_value (lua_State *L)
     return 0;
 }
 
-#line 2894 "ygtk.c.in"
+#line 2851 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_adjustment[] = {
 // %% ylib def:	gtk_adjustment
@@ -2067,11 +2246,11 @@ static const luaL_Reg ylib_gtk_adjustment[] = {
     { "get_value",         ygtk_adjustment_get_value },
     { "new",               ygtk_adjustment_new },
     { "set_value",         ygtk_adjustment_set_value },
-#line 2897 "ygtk.c.in"
+#line 2854 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 3014 "ygtk.c.in"
+#line 2971 "ygtk.c.in"
 
 /* GtkObject / GtkWidget */
 
@@ -2079,7 +2258,7 @@ ygtk_class_data y_gtk_widget_class = {
     "GtkWidget", "gtk", "widget", &y_g_class
 };
 
-#line 3030 "ygtk.c.in"
+#line 2987 "ygtk.c.in"
 
 static int
 ygtk_widget_SET_FLAGS(lua_State *L)
@@ -2092,7 +2271,7 @@ ygtk_widget_SET_FLAGS(lua_State *L)
     return 0;
 }
 
-#line 3079 "ygtk.c.in"
+#line 3036 "ygtk.c.in"
 
 // %% function:	add_events	vo(GTK_WIDGET)i
 static int
@@ -2103,10 +2282,18 @@ ygtk_widget_add_events (lua_State *L)
     return 0;
 }
 
-#line 3080 "ygtk.c.in"
-#line 3091 "ygtk.c.in"
+#line 3037 "ygtk.c.in"
+#line 3048 "ygtk.c.in"
 
-#line 3104 "ygtk.c.in"
+// %% function:	destroy	vo(GTK_WIDGET)
+static int
+ygtk_widget_destroy (lua_State *L)
+{
+    gtk_widget_destroy(GTK_WIDGET(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance));
+    return 0;
+}
+
+#line 3049 "ygtk.c.in"
 
 static int
 ygtk_widget_get_window(lua_State *L)
@@ -2136,9 +2323,9 @@ ygtk_widget_hide (lua_State *L)
     return 0;
 }
 
-#line 3125 "ygtk.c.in"
+#line 3071 "ygtk.c.in"
 
-#line 3142 "ygtk.c.in"
+#line 3088 "ygtk.c.in"
 
 // %% function:	queue_draw	vo(GTK_WIDGET)
 static int
@@ -2148,9 +2335,9 @@ ygtk_widget_queue_draw (lua_State *L)
     return 0;
 }
 
-#line 3143 "ygtk.c.in"
+#line 3089 "ygtk.c.in"
 
-#line 3204 "ygtk.c.in"
+#line 3150 "ygtk.c.in"
 // %% function:	show	vo(GTK_WIDGET)
 static int
 ygtk_widget_show (lua_State *L)
@@ -2159,7 +2346,7 @@ ygtk_widget_show (lua_State *L)
     return 0;
 }
 
-#line 3204 "ygtk.c.in"
+#line 3150 "ygtk.c.in"
 // %% function:	show_all	vo(GTK_WIDGET)
 static int
 ygtk_widget_show_all (lua_State *L)
@@ -2168,21 +2355,22 @@ ygtk_widget_show_all (lua_State *L)
     return 0;
 }
 
-#line 3205 "ygtk.c.in"
+#line 3151 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_widget[] = {
-#line 3209 "ygtk.c.in"
+#line 3155 "ygtk.c.in"
     { "SET_FLAGS",        ygtk_widget_SET_FLAGS },
-#line 3213 "ygtk.c.in"
+#line 3158 "ygtk.c.in"
     { "get_window",       ygtk_widget_get_window },
-#line 3220 "ygtk.c.in"
+#line 3165 "ygtk.c.in"
 // %% ylib def:	gtk_widget
     { "add_events",        ygtk_widget_add_events },
+    { "destroy",           ygtk_widget_destroy },
     { "hide",              ygtk_widget_hide },
     { "queue_draw",        ygtk_widget_queue_draw },
     { "show",              ygtk_widget_show },
     { "show_all",          ygtk_widget_show_all },
-#line 3220 "ygtk.c.in"
+#line 3165 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2201,15 +2389,15 @@ ygtk_container_add (lua_State *L)
     return 0;
 }
 
-#line 3229 "ygtk.c.in"
+#line 3174 "ygtk.c.in"
 
-#line 3245 "ygtk.c.in"
+#line 3190 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_container[] = {
-#line 3248 "ygtk.c.in"
+#line 3193 "ygtk.c.in"
 // %% ylib def:	gtk_container
     { "add",               ygtk_container_add },
-#line 3248 "ygtk.c.in"
+#line 3193 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2232,10 +2420,21 @@ ygtk_button_new (lua_State *L)
     return 1;
 }
 
-#line 3257 "ygtk.c.in"
+#line 3202 "ygtk.c.in"
+// %% function:	new_from_stock	Os
+static int
+ygtk_button_new_from_stock (lua_State *L)
+{
+    GObject *o;
 
-#line 3273 "ygtk.c.in"
+    o = (GObject *)gtk_button_new_from_stock((const char *)luaL_checkstring(L, 1));
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_button_class);
 
+    return 1;
+}
+
+#line 3203 "ygtk.c.in"
 // %% function:	new_with_label	Os
 static int
 ygtk_button_new_with_label (lua_State *L)
@@ -2249,14 +2448,14 @@ ygtk_button_new_with_label (lua_State *L)
     return 1;
 }
 
-#line 3274 "ygtk.c.in"
+#line 3204 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_button[] = {
-#line 3278 "ygtk.c.in"
 // %% ylib def:	gtk_button
     { "new",               ygtk_button_new },
+    { "new_from_stock",    ygtk_button_new_from_stock },
     { "new_with_label",    ygtk_button_new_with_label },
-#line 3278 "ygtk.c.in"
+#line 3207 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2266,10 +2465,42 @@ ygtk_class_data y_gtk_toggle_button_class = {
     "GtkToggleButton", "gtk", "toggle_button", &y_gtk_button_class
 };
 
-#line 3329 "ygtk.c.in"
+/* -DOCNOTE- gtk_toggle_button_get_active(): can also use 'toggle_button:get("active")' */
+// %% function:	get_active	bo(GTK_TOGGLE_BUTTON)
+static int
+ygtk_toggle_button_get_active (lua_State *L)
+{
+    gboolean b;
+
+    b = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance));
+    lua_pushboolean(L, b);
+    return 1;
+}
+
+#line 3217 "ygtk.c.in"
+// %% function:	new	Ov
+static int
+ygtk_toggle_button_new (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_toggle_button_new();
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_toggle_button_class);
+
+    return 1;
+}
+
+#line 3218 "ygtk.c.in"
+
+#line 3234 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_toggle_button[] = {
-#line 3334 "ygtk.c.in"
+#line 3237 "ygtk.c.in"
+// %% ylib def:	gtk_toggle_button
+    { "get_active",        ygtk_toggle_button_get_active },
+    { "new",               ygtk_toggle_button_new },
+#line 3237 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2292,7 +2523,7 @@ ygtk_check_button_new (lua_State *L)
     return 1;
 }
 
-#line 3343 "ygtk.c.in"
+#line 3246 "ygtk.c.in"
 // %% function:	new_with_label	Os
 static int
 ygtk_check_button_new_with_label (lua_State *L)
@@ -2306,13 +2537,13 @@ ygtk_check_button_new_with_label (lua_State *L)
     return 1;
 }
 
-#line 3344 "ygtk.c.in"
+#line 3247 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_check_button[] = {
 // %% ylib def:	gtk_check_button
     { "new",               ygtk_check_button_new },
     { "new_with_label",    ygtk_check_button_new_with_label },
-#line 3347 "ygtk.c.in"
+#line 3250 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2341,7 +2572,21 @@ ygtk_combo_box_append_text(lua_State *L)
     return 0;
 }
 
-#line 3400 "ygtk.c.in"
+/* -DOCNOTE- gtk_combo_box_get_active(): can also use 'combo_box:get("active")' */
+// %% function:	get_active	io(GTK_COMBO_BOX)
+static int
+ygtk_combo_box_get_active (lua_State *L)
+{
+    int i;
+
+    i = gtk_combo_box_get_active(GTK_COMBO_BOX(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance));
+    lua_pushnumber(L, (double)i);
+    return 1;
+}
+
+#line 3279 "ygtk.c.in"
+
+#line 3291 "ygtk.c.in"
 
 static int
 ygtk_combo_box_get_active_text(lua_State *L)
@@ -2372,9 +2617,9 @@ ygtk_combo_box_new_text (lua_State *L)
     return 1;
 }
 
-#line 3417 "ygtk.c.in"
+#line 3308 "ygtk.c.in"
 
-#line 3435 "ygtk.c.in"
+#line 3326 "ygtk.c.in"
 
 // %% function:	set_active	vo(GTK_COMBO_BOX)i
 static int
@@ -2385,24 +2630,54 @@ ygtk_combo_box_set_active (lua_State *L)
     return 0;
 }
 
-#line 3436 "ygtk.c.in"
+#line 3327 "ygtk.c.in"
 
-#line 3448 "ygtk.c.in"
+#line 3339 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_combo_box[] = {
-#line 3451 "ygtk.c.in"
+#line 3342 "ygtk.c.in"
     { "append_text",       ygtk_combo_box_append_text },
-#line 3454 "ygtk.c.in"
+#line 3344 "ygtk.c.in"
     { "get_active_text",   ygtk_combo_box_get_active_text },
-#line 3461 "ygtk.c.in"
+#line 3351 "ygtk.c.in"
 // %% ylib def:	gtk_combo_box
+    { "get_active",        ygtk_combo_box_get_active },
     { "new_text",          ygtk_combo_box_new_text },
     { "set_active",        ygtk_combo_box_set_active },
-#line 3461 "ygtk.c.in"
+#line 3351 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 3590 "ygtk.c.in"
+/* GtkObject / GtkWidget / GtkContainer / GtkBin / GtkFrame */
+
+ygtk_class_data y_gtk_frame_class = {
+    "GtkFrame", "gtk", "frame", &y_gtk_container_class
+};
+
+// %% function:	new	Os0
+static int
+ygtk_frame_new (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_frame_new((lua_isnoneornil(L, 1) ? NULL : (const char *)luaL_checkstring(L, 1)));
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_frame_class);
+
+    return 1;
+}
+
+#line 3360 "ygtk.c.in"
+#line 3379 "ygtk.c.in"
+
+static const luaL_Reg ylib_gtk_frame[] = {
+// %% ylib def:	gtk_frame
+    { "new",               ygtk_frame_new },
+#line 3381 "ygtk.c.in"
+    { NULL, NULL }
+};
+
+#line 3480 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkContainer / GtkBin / GtkScrolledWindow */
 
@@ -2410,7 +2685,7 @@ ygtk_class_data y_gtk_scrolled_window_class = {
     "GtkScrolledWindow", "gtk", "scrolled_window", &y_gtk_container_class
 };
 
-#line 3612 "ygtk.c.in"
+#line 3502 "ygtk.c.in"
 
 static int
 ygtk_scrolled_window_new(lua_State *L)
@@ -2442,12 +2717,12 @@ ygtk_scrolled_window_new(lua_State *L)
 }
 
 static const luaL_Reg ylib_gtk_scrolled_window[] = {
-#line 3644 "ygtk.c.in"
+#line 3534 "ygtk.c.in"
     { "new",               ygtk_scrolled_window_new },
     { NULL, NULL }
 };
 
-#line 3687 "ygtk.c.in"
+#line 3577 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkContainer / GtkBin / GtkWindow */
 
@@ -2455,7 +2730,20 @@ ygtk_class_data y_gtk_window_class = {
     "GtkWindow", "gtk", "window", &y_gtk_container_class
 };
 
-#line 3722 "ygtk.c.in"
+#line 3599 "ygtk.c.in"
+
+static int
+ygtk_window_get_size(lua_State *L)
+{
+    ygtk_object *w = ygtk_checkuserdata(L, 1);
+    gint width, height;
+
+    gtk_window_get_size(GTK_WINDOW(w->instance), &width, &height);
+    lua_pushinteger(L, width);
+    lua_pushinteger(L, height);
+
+    return 2;
+}
 
 static int
 ygtk_window_new(lua_State *L)
@@ -2487,18 +2775,19 @@ ygtk_window_set_title (lua_State *L)
     return 0;
 }
 
-#line 3744 "ygtk.c.in"
+#line 3634 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_window[] = {
-#line 3749 "ygtk.c.in"
+#line 3638 "ygtk.c.in"
+    { "get_size",        ygtk_window_get_size },
     { "new",             ygtk_window_new },
 // %% ylib def:	gtk_window
     { "set_title",         ygtk_window_set_title },
-#line 3750 "ygtk.c.in"
+#line 3640 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 3902 "ygtk.c.in"
+#line 3792 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkContainer / GtkBin / GtkWindow / GtkDialog */
 
@@ -2519,7 +2808,7 @@ ygtk_dialog_add_button (lua_State *L)
     return 0;
 }
 
-#line 3912 "ygtk.c.in"
+#line 3802 "ygtk.c.in"
 
 static int
 ygtk_dialog_get_action_area(lua_State *L)
@@ -2590,16 +2879,27 @@ ygtk_dialog_new_with_buttons(lua_State *L)
 
 }
 
-#line 3997 "ygtk.c.in"
+// %% function:	run	io(GTK_DIALOG)
+static int
+ygtk_dialog_run (lua_State *L)
+{
+    int i;
+
+    i = gtk_dialog_run(GTK_DIALOG(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance));
+    lua_pushnumber(L, (double)i);
+    return 1;
+}
+
+#line 3873 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_dialog[] = {
     { "get_action_area",   ygtk_dialog_get_action_area },
     { "get_content_area",  ygtk_dialog_get_content_area },
     { "new_with_buttons",  ygtk_dialog_new_with_buttons },
-#line 4003 "ygtk.c.in"
 // %% ylib def:	gtk_dialog
     { "add_button",        ygtk_dialog_add_button },
-#line 4003 "ygtk.c.in"
+    { "run",               ygtk_dialog_run },
+#line 3879 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2622,16 +2922,16 @@ ygtk_about_dialog_new (lua_State *L)
     return 1;
 }
 
-#line 4012 "ygtk.c.in"
+#line 3888 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_about_dialog[] = {
 // %% ylib def:	gtk_about_dialog
     { "new",               ygtk_about_dialog_new },
-#line 4015 "ygtk.c.in"
+#line 3891 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 4120 "ygtk.c.in"
+#line 3996 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkContainer / GtkBox */
 
@@ -2651,7 +2951,7 @@ ygtk_box_pack_end (lua_State *L)
     return 0;
 }
 
-#line 4127 "ygtk.c.in"
+#line 4003 "ygtk.c.in"
 // %% function:	pack_start	vo(GTK_BOX)o(GTK_WIDGET)bbi
 static int
 ygtk_box_pack_start (lua_State *L)
@@ -2664,13 +2964,13 @@ ygtk_box_pack_start (lua_State *L)
     return 0;
 }
 
-#line 4128 "ygtk.c.in"
+#line 4004 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_box[] = {
 // %% ylib def:	gtk_box
     { "pack_end",          ygtk_box_pack_end },
     { "pack_start",        ygtk_box_pack_start },
-#line 4131 "ygtk.c.in"
+#line 4007 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2694,12 +2994,12 @@ ygtk_hbox_new (lua_State *L)
     return 1;
 }
 
-#line 4140 "ygtk.c.in"
+#line 4016 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_hbox[] = {
 // %% ylib def:	gtk_hbox
     { "new",               ygtk_hbox_new },
-#line 4143 "ygtk.c.in"
+#line 4019 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2723,16 +3023,16 @@ ygtk_vbox_new (lua_State *L)
     return 1;
 }
 
-#line 4152 "ygtk.c.in"
+#line 4028 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_vbox[] = {
 // %% ylib def:	gtk_vbox
     { "new",               ygtk_vbox_new },
-#line 4155 "ygtk.c.in"
+#line 4031 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 4183 "ygtk.c.in"
+#line 4059 "ygtk.c.in"
 
 #ifdef GTK_TYPE_CONTROL
 /* GtkObject / GtkWidget / GtkContainer / GtkControlPanel (see also GtkControl) */
@@ -2756,7 +3056,7 @@ ygtk_control_panel_new (lua_State *L)
     return 1;
 }
 
-#line 4191 "ygtk.c.in"
+#line 4067 "ygtk.c.in"
 // %% function:	put	vo(GTK_CONTROL_PANEL)o(GTK_WIDGET)ii
 static int
 ygtk_control_panel_put (lua_State *L)
@@ -2768,18 +3068,18 @@ ygtk_control_panel_put (lua_State *L)
     return 0;
 }
 
-#line 4192 "ygtk.c.in"
+#line 4068 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_control_panel[] = {
 // %% ylib def:	gtk_control_panel
     { "new",               ygtk_control_panel_new },
     { "put",               ygtk_control_panel_put },
-#line 4195 "ygtk.c.in"
+#line 4071 "ygtk.c.in"
     { NULL, NULL }
 };
 #endif /* GTK_TYPE_CONTROL */
 
-#line 4403 "ygtk.c.in"
+#line 4279 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkContainer / GtkTable */
 
@@ -2804,7 +3104,7 @@ ygtk_table_attach (lua_State *L)
     return 0;
 }
 
-#line 4410 "ygtk.c.in"
+#line 4286 "ygtk.c.in"
 // %% function:	new	Oiib
 static int
 ygtk_table_new (lua_State *L)
@@ -2820,13 +3120,13 @@ ygtk_table_new (lua_State *L)
     return 1;
 }
 
-#line 4411 "ygtk.c.in"
+#line 4287 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_table[] = {
 // %% ylib def:	gtk_table
     { "attach",            ygtk_table_attach },
     { "new",               ygtk_table_new },
-#line 4414 "ygtk.c.in"
+#line 4290 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2861,7 +3161,7 @@ ygtk_text_view_new (lua_State *L)
     return 1;
 }
 
-#line 4435 "ygtk.c.in"
+#line 4311 "ygtk.c.in"
 
 static int
 ygtk_text_view_scroll_to_mark_by_name(lua_State *L)  /* -DOCNOTE- by name, so we don't need to handle GtkTextMarks */
@@ -2886,11 +3186,11 @@ static const luaL_Reg ylib_gtk_text_view[] = {
     { "scroll_to_mark_by_name", ygtk_text_view_scroll_to_mark_by_name },
 // %% ylib def:	gtk_text_view
     { "new",               ygtk_text_view_new },
-#line 4458 "ygtk.c.in"
+#line 4334 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 4550 "ygtk.c.in"
+#line 4426 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkDrawingArea */
 
@@ -2911,12 +3211,12 @@ ygtk_drawing_area_new (lua_State *L)
     return 1;
 }
 
-#line 4557 "ygtk.c.in"
+#line 4433 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_drawing_area[] = {
 // %% ylib def:	gtk_drawing_area
     { "new",               ygtk_drawing_area_new },
-#line 4560 "ygtk.c.in"
+#line 4436 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2926,7 +3226,7 @@ ygtk_class_data y_gtk_entry_class = {
     "GtkEntry", "gtk", "entry", &y_gtk_widget_class
 };
 
-#line 4615 "ygtk.c.in"
+#line 4491 "ygtk.c.in"
 
 /* GtkObject / GtkWidget / GtkEntry / GtkSpinButton */
 
@@ -2949,12 +3249,12 @@ ygtk_spin_button_new (lua_State *L)
     return 1;
 }
 
-#line 4622 "ygtk.c.in"
+#line 4498 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_spin_button[] = {
 // %% ylib def:	gtk_spin_button
     { "new",               ygtk_spin_button_new },
-#line 4625 "ygtk.c.in"
+#line 4501 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -2977,15 +3277,15 @@ ygtk_image_new_from_file (lua_State *L)
     return 1;
 }
 
-#line 4634 "ygtk.c.in"
+#line 4510 "ygtk.c.in"
 
-#line 4648 "ygtk.c.in"
+#line 4524 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_image[] = {
-#line 4651 "ygtk.c.in"
+#line 4527 "ygtk.c.in"
 // %% ylib def:	gtk_image
     { "new_from_file",     ygtk_image_new_from_file },
-#line 4651 "ygtk.c.in"
+#line 4527 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -3008,19 +3308,64 @@ ygtk_label_new (lua_State *L)
     return 1;
 }
 
-#line 4660 "ygtk.c.in"
+#line 4536 "ygtk.c.in"
+// %% function:	set_text	vo(GTK_LABEL)s
+static int
+ygtk_label_set_text (lua_State *L)
+{
+    gtk_label_set_text(GTK_LABEL(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance),
+        (const char *)luaL_checkstring(L, 2));
+    return 0;
+}
 
-#line 4677 "ygtk.c.in"
+#line 4537 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_label[] = {
-#line 4680 "ygtk.c.in"
 // %% ylib def:	gtk_label
     { "new",               ygtk_label_new },
-#line 4680 "ygtk.c.in"
+    { "set_text",          ygtk_label_set_text },
+#line 4540 "ygtk.c.in"
     { NULL, NULL }
 };
 
-#line 4723 "ygtk.c.in"
+/* GtkObject / GtkWidget / GtkProgress / GtkProgressBar */
+
+ygtk_class_data y_gtk_progress_bar_class = {
+    "GtkProgressBar", "gtk", "progress_bar", &y_gtk_widget_class
+};
+
+// %% function:	new	Ov
+static int
+ygtk_progress_bar_new (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_progress_bar_new();
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_progress_bar_class);
+
+    return 1;
+}
+
+#line 4549 "ygtk.c.in"
+// %% function:	set_fraction	vo(GTK_PROGRESS_BAR)d
+static int
+ygtk_progress_bar_set_fraction (lua_State *L)
+{
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance),
+        luaL_checknumber(L, 2));
+    return 0;
+}
+
+#line 4550 "ygtk.c.in"
+
+static const luaL_Reg ylib_gtk_progress_bar[] = {
+// %% ylib def:	gtk_progress_bar
+    { "new",               ygtk_progress_bar_new },
+    { "set_fraction",      ygtk_progress_bar_set_fraction },
+#line 4553 "ygtk.c.in"
+    { NULL, NULL }
+};
 
 /* GtkObject / GtkWidget / GtkRange */
 
@@ -3028,10 +3373,10 @@ ygtk_class_data y_gtk_range_class = {
     "GtkRange", "gtk", "range", &y_gtk_widget_class
 };
 
-#line 4746 "ygtk.c.in"
+#line 4578 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_range[] = {
-#line 4749 "ygtk.c.in"
+#line 4581 "ygtk.c.in"
     { NULL, NULL }
 };
 
@@ -3064,7 +3409,7 @@ ygtk_control_new (lua_State *L)
     return 1;
 }
 
-#line 4759 "ygtk.c.in"
+#line 4591 "ygtk.c.in"
 // %% function:	set_prelight_offsets	vo(GTK_CONTROL)ii
 static int
 ygtk_control_set_prelight_offsets (lua_State *L)
@@ -3075,7 +3420,7 @@ ygtk_control_set_prelight_offsets (lua_State *L)
     return 0;
 }
 
-#line 4760 "ygtk.c.in"
+#line 4592 "ygtk.c.in"
 // %% function:	set_widget_bg_parent_relative_in_style	vo(GTK_WIDGET)
 static int
 ygtk_control_set_widget_bg_parent_relative_in_style (lua_State *L)
@@ -3084,14 +3429,14 @@ ygtk_control_set_widget_bg_parent_relative_in_style (lua_State *L)
     return 0;
 }
 
-#line 4761 "ygtk.c.in"
+#line 4593 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_control[] = {
 // %% ylib def:	gtk_control
     { "new",               ygtk_control_new },
     { "set_prelight_offsets", ygtk_control_set_prelight_offsets },
     { "set_widget_bg_parent_relative_in_style", ygtk_control_set_widget_bg_parent_relative_in_style },
-#line 4764 "ygtk.c.in"
+#line 4596 "ygtk.c.in"
     { NULL, NULL }
 };
 #endif /* GTK_TYPE_CONTROL */
@@ -3116,17 +3461,105 @@ ygtk_knob_new (lua_State *L)
     return 1;
 }
 
-#line 4775 "ygtk.c.in"
+#line 4607 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_knob[] = {
 // %% ylib def:	gtk_knob
     { "new",               ygtk_knob_new },
-#line 4778 "ygtk.c.in"
+#line 4610 "ygtk.c.in"
     { NULL, NULL }
 };
 #endif /* GTK_TYPE_KNOB */
 
-#line 4875 "ygtk.c.in"
+/* GtkObject / GtkWidget / GtkRange / GtkScale / GtkHScale */
+
+ygtk_class_data y_gtk_hscale_class = {
+    "GtkHScale", "gtk", "hscale", &y_gtk_range_class
+};
+
+// %% function:	new	Oo(GTK_ADJUSTMENT)
+static int
+ygtk_hscale_new (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_hscale_new(GTK_ADJUSTMENT(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance));
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_hscale_class);
+
+    return 1;
+}
+
+#line 4620 "ygtk.c.in"
+// %% function:	new_with_range	Oddd
+static int
+ygtk_hscale_new_with_range (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_hscale_new_with_range(luaL_checknumber(L, 1),
+            luaL_checknumber(L, 2),
+            luaL_checknumber(L, 3));
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_hscale_class);
+
+    return 1;
+}
+
+#line 4621 "ygtk.c.in"
+
+static const luaL_Reg ylib_gtk_hscale[] = {
+// %% ylib def:	gtk_hscale
+    { "new",               ygtk_hscale_new },
+    { "new_with_range",    ygtk_hscale_new_with_range },
+#line 4624 "ygtk.c.in"
+    { NULL, NULL }
+};
+
+/* GtkObject / GtkWidget / GtkRange / GtkScale / GtkVScale */
+
+ygtk_class_data y_gtk_vscale_class = {
+    "GtkVScale", "gtk", "vscale", &y_gtk_range_class
+};
+
+// %% function:	new	Oo(GTK_ADJUSTMENT)
+static int
+ygtk_vscale_new (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_vscale_new(GTK_ADJUSTMENT(((ygtk_object *)ygtk_checkuserdata(L, 1))->instance));
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_vscale_class);
+
+    return 1;
+}
+
+#line 4633 "ygtk.c.in"
+// %% function:	new_with_range	Oddd
+static int
+ygtk_vscale_new_with_range (lua_State *L)
+{
+    GObject *o;
+
+    o = (GObject *)gtk_vscale_new_with_range(luaL_checknumber(L, 1),
+            luaL_checknumber(L, 2),
+            luaL_checknumber(L, 3));
+    g_object_ref_sink(o);
+    ygtk_make_object(L, o, &y_gtk_vscale_class);
+
+    return 1;
+}
+
+#line 4634 "ygtk.c.in"
+
+static const luaL_Reg ylib_gtk_vscale[] = {
+// %% ylib def:	gtk_vscale
+    { "new",               ygtk_vscale_new },
+    { "new_with_range",    ygtk_vscale_new_with_range },
+#line 4637 "ygtk.c.in"
+    { NULL, NULL }
+};
 
 /* GtkObject / GtkWidget / GtkSeparator / GtkHSeparator */
 
@@ -3147,14 +3580,16 @@ ygtk_hseparator_new (lua_State *L)
     return 1;
 }
 
-#line 4882 "ygtk.c.in"
+#line 4646 "ygtk.c.in"
 
 static const luaL_Reg ylib_gtk_hseparator[] = {
 // %% ylib def:	gtk_hseparator
     { "new",               ygtk_hseparator_new },
-#line 4885 "ygtk.c.in"
+#line 4649 "ygtk.c.in"
     { NULL, NULL }
 };
+
+/* initialization and enumerations */
 
 static const char *ygtk_init_string = 
 #if !defined(YGTK_STANDALONE) && LUA_VERSION_NUM < 502
@@ -3176,19 +3611,18 @@ static const ygtk_enum_data yg_enums[] = {
 
 static const ygtk_enum_data ycairo_enums[] = {
     { "FONT_SLANT_NORMAL",   CAIRO_FONT_SLANT_NORMAL },
-#line 4909 "ygtk.c.in"
+#line 4675 "ygtk.c.in"
     { "FONT_WEIGHT_BOLD",    CAIRO_FONT_WEIGHT_BOLD },
-#line 4917 "ygtk.c.in"
+#line 4677 "ygtk.c.in"
+    { "FORMAT_RGB24",        CAIRO_FORMAT_RGB24 },
+    { "LINE_CAP_BUTT",       CAIRO_LINE_CAP_BUTT },
+    { "LINE_CAP_ROUND",      CAIRO_LINE_CAP_ROUND },
+    { "LINE_CAP_SQUARE",     CAIRO_LINE_CAP_SQUARE },
+#line 4683 "ygtk.c.in"
     { NULL, 0 }
 };
 
-static const ygtk_enum_data ypango_enums[] = {
-    { "SCALE",               PANGO_SCALE },
-    { "STYLE_ITALIC",        PANGO_STYLE_ITALIC },
-    { "UNDERLINE_SINGLE",    PANGO_UNDERLINE_SINGLE },
-    { "WEIGHT_BOLD",         PANGO_WEIGHT_BOLD },
-    { NULL, 0 }
-};
+#line 4693 "ygtk.c.in"
 
 static const ygtk_enum_data ygdk_enums[] = {
     /* GdkEventMask (gdkevents.h) */
@@ -3198,7 +3632,7 @@ static const ygtk_enum_data ygdk_enums[] = {
     { "BUTTON_RELEASE_MASK", GDK_BUTTON_RELEASE_MASK },
     { "KEY_PRESS_MASK",      GDK_KEY_PRESS_MASK },
     { "SCROLL_MASK",         GDK_SCROLL_MASK },
-#line 4938 "ygtk.c.in"
+#line 4704 "ygtk.c.in"
     { NULL, 0 }
 };
 
@@ -3207,12 +3641,14 @@ static const ygtk_enum_data ygtk_enums[] = {
     { "EXPAND",              GTK_EXPAND },
     { "SHRINK",              GTK_SHRINK },
     { "FILL",                GTK_FILL },
-#line 4950 "ygtk.c.in"
+#line 4716 "ygtk.c.in"
     { "POLICY_AUTOMATIC",    GTK_POLICY_AUTOMATIC },
-#line 4958 "ygtk.c.in"
+#line 4719 "ygtk.c.in"
+    { "POS_RIGHT",           GTK_POS_RIGHT },
+#line 4724 "ygtk.c.in"
     /* */
     { "WINDOW_TOPLEVEL",     GTK_WINDOW_TOPLEVEL },
-#line 4969 "ygtk.c.in"
+#line 4735 "ygtk.c.in"
 #ifdef GTK_TYPE_CONTROL
     /* GtkControlType (gtkcontrol.h) */
     { "CONTROL_ROTARY",      GTK_CONTROL_ROTARY },
@@ -3223,16 +3659,20 @@ static const ygtk_enum_data ygtk_enums[] = {
     { "CONTROL_SWITCH",      GTK_CONTROL_SWITCH },
     { "CONTROL_RADIO",       GTK_CONTROL_RADIO },
 #endif
-#line 4981 "ygtk.c.in"
+#line 4747 "ygtk.c.in"
     /* GtkJustification (gtkenums.h) */
     { "JUSTIFY_CENTER",      GTK_JUSTIFY_CENTER },
-#line 4985 "ygtk.c.in"
+#line 4751 "ygtk.c.in"
     /* GtkResponseType (gtkdialog.h) */
-#line 4987 "ygtk.c.in"
+#line 4753 "ygtk.c.in"
     { "RESPONSE_CANCEL",     GTK_RESPONSE_CANCEL },
-#line 5005 "ygtk.c.in"
+#line 4767 "ygtk.c.in"
+    /* GtkUpdateType */
+    { "UPDATE_CONTINUOUS",   GTK_UPDATE_CONTINUOUS },
+    { "UPDATE_DELAYED",      GTK_UPDATE_DELAYED },
+    /* GtkWidgetFlags (gtkwidget.h) */
     { "CAN_FOCUS",           GTK_CAN_FOCUS },
-#line 5007 "ygtk.c.in"
+#line 4773 "ygtk.c.in"
     /* GtkWrapMode (gtkenums.h) */
     { "WRAP_WORD",           GTK_WRAP_WORD },
     { NULL, 0 }
@@ -3250,9 +3690,7 @@ luaopen_ygtk (lua_State *L)
     ygtk_register(L, "cairo",   ylib_cairo);
     ygtk_set_enums(L, ycairo_enums);
     lua_remove(L, -1);
-    ygtk_register(L, "pango",   ylib_pango);
-    ygtk_set_enums(L, ypango_enums);
-    lua_remove(L, -1);
+#line 4793 "ygtk.c.in"
     ygtk_register(L, "gdk",     ylib_gdk);
     ygtk_set_enums(L, ygdk_enums);
     lua_remove(L, -1);
@@ -3265,48 +3703,51 @@ luaopen_ygtk (lua_State *L)
     lua_settop(L, top);  /* clear stack of any results of the above */
     ygtk_class_pointer_quark = g_quark_from_string ("ygtk_class_pointer");
     ygtk_build_simple_class(L, "g.boxed",             ylib_g_boxed);
-#line 5040 "ygtk.c.in"
+#line 4806 "ygtk.c.in"
     ygtk_build_simple_class(L, "cairo.context",       ylib_cairo_context);
-#line 5044 "ygtk.c.in"
+    ygtk_build_simple_class(L, "cairo.surface",       ylib_cairo_surface);
+    ygtk_build_simple_class(L, "cairo.image_surface", ylib_cairo_image_surface);
+#line 4810 "ygtk.c.in"
     ygtk_build_class(L, &y_gdk_drawable_class,             ylib_gdk_drawable);
     ygtk_build_class(L, &y_gdk_window_class,               ylib_gdk_window);
     ygtk_build_class(L, &y_gdk_pixbuf_class,               ylib_gdk_pixbuf);
-#line 5052 "ygtk.c.in"
+#line 4818 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_text_buffer_class,          ylib_gtk_text_buffer);
-#line 5055 "ygtk.c.in"
+#line 4821 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_adjustment_class,           ylib_gtk_adjustment);
-#line 5060 "ygtk.c.in"
+#line 4826 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_widget_class,               ylib_gtk_widget);
     ygtk_build_class(L, &y_gtk_container_class,            ylib_gtk_container);
     ygtk_build_class(L, &y_gtk_button_class,               ylib_gtk_button);
     ygtk_build_class(L, &y_gtk_toggle_button_class,        ylib_gtk_toggle_button);
     ygtk_build_class(L, &y_gtk_check_button_class,         ylib_gtk_check_button);
     ygtk_build_class(L, &y_gtk_combo_box_class,            ylib_gtk_combo_box);
-#line 5069 "ygtk.c.in"
+    ygtk_build_class(L, &y_gtk_frame_class,                ylib_gtk_frame);
+#line 4835 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_scrolled_window_class,      ylib_gtk_scrolled_window);
-#line 5071 "ygtk.c.in"
+#line 4837 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_window_class,               ylib_gtk_window);
-#line 5073 "ygtk.c.in"
+#line 4839 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_dialog_class,               ylib_gtk_dialog);
     ygtk_build_class(L, &y_gtk_about_dialog_class,         ylib_gtk_about_dialog);
-#line 5077 "ygtk.c.in"
+#line 4843 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_box_class,                  ylib_gtk_box);
     ygtk_build_class(L, &y_gtk_hbox_class,                 ylib_gtk_hbox);
     ygtk_build_class(L, &y_gtk_vbox_class,                 ylib_gtk_vbox);
-#line 5081 "ygtk.c.in"
+#line 4847 "ygtk.c.in"
 #ifdef GTK_TYPE_CONTROL
     ygtk_build_class(L, &y_gtk_control_panel_class,        ylib_gtk_control_panel);
 #endif
-#line 5088 "ygtk.c.in"
+#line 4854 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_table_class,                ylib_gtk_table);
     ygtk_build_class(L, &y_gtk_text_view_class,            ylib_gtk_text_view);
-#line 5091 "ygtk.c.in"
+#line 4857 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_drawing_area_class,         ylib_gtk_drawing_area);
-#line 5093 "ygtk.c.in"
+#line 4859 "ygtk.c.in"
     ygtk_build_class(L, &y_gtk_spin_button_class,          ylib_gtk_spin_button);
     ygtk_build_class(L, &y_gtk_image_class,                ylib_gtk_image);
     ygtk_build_class(L, &y_gtk_label_class,                ylib_gtk_label);
-#line 5097 "ygtk.c.in"
+    ygtk_build_class(L, &y_gtk_progress_bar_class,         ylib_gtk_progress_bar);
     ygtk_build_class(L, &y_gtk_range_class,                ylib_gtk_range);
 #ifdef GTK_TYPE_CONTROL
     ygtk_build_class(L, &y_gtk_control_class,              ylib_gtk_control);
@@ -3314,7 +3755,8 @@ luaopen_ygtk (lua_State *L)
 #ifdef GTK_TYPE_KNOB
     ygtk_build_class(L, &y_gtk_knob_class,                 ylib_gtk_knob);
 #endif
-#line 5106 "ygtk.c.in"
+    ygtk_build_class(L, &y_gtk_hscale_class,               ylib_gtk_hscale);
+    ygtk_build_class(L, &y_gtk_vscale_class,               ylib_gtk_vscale);
     ygtk_build_class(L, &y_gtk_hseparator_class,           ylib_gtk_hseparator);
 
     if (top != lua_gettop(L))

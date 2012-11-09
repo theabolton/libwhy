@@ -1,4 +1,4 @@
-#! /usr/bin/env lua
+#!/usr/bin/env ylua
 
 -- Epicycloid (hypotrochoid, epitrochoid) demo, by Sean Bolton
 
@@ -22,7 +22,15 @@
 
 -- smbolton 20091130: initial version
 
-require("ygtk")
+function try_require(module, message)
+  if not pcall(require, module) then
+    print(string.format("%s: could not load module '%s': %s", arg[0], module, message))
+    os.exit(1)
+  end
+end
+
+try_require("ygtk", "perhaps you need to run this with libwhy's ylua?")
+
 pcall(require, "strict")
 
 -- declare globals
